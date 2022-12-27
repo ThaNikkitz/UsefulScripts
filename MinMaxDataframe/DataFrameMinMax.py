@@ -12,6 +12,10 @@ parser.add_argument('-o', '--output_path', type = str, required = False, help = 
 parser.add_argument('-m', '--minmax', type = str, required = False, help = 'Searching for the "min" or "max" value. Default is minimum.')
 
 arg = parser.parse_args()
+if arg.minmax == None:
+    selector = "min"
+else:
+    selector = arg.minmax
 
 # Load the dataframe, check if the first column has data (a.k.a has "ref" in the header) or is just the row index, and proceed accordingly
 df = pandas.read_csv(arg.input_path)
@@ -20,13 +24,13 @@ if "ref" not in df.columns[0]:
 
 valuesArray = numpy.empty(len(df.values), dtype = int)
 
-if arg.minmax == "min":
+if selector == "min":
     for i in range(len(df)):
         # Strip and splits are only to grab the refFrame's index. The numpy.where method gets the index of the minimum RMSD value for the i-th row.
         # df.columns just gets the index mentioned, but in the headers' array, and the [0] indexing is to get the shape (1,) array's data - the corresponding header.
         valuesArray[i] = df.columns[numpy.where(df.loc[i] == min(df.loc[i].values))][0].strip().split('.pdb')[0].split('Frame')[-1]
 
-elif arg.minmax == "max":
+elif selector == "max":
     for i in range(len(df)):
         # Strip and splits are only to grab the refFrame's index. The numpy.where method gets the index of the minimum RMSD value for the i-th row.
         # df.columns just gets the index mentioned, but in the headers' array, and the [0] indexing is to get the shape (1,) array's data - the corresponding header.
